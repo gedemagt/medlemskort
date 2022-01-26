@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>W3.CSS Template</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    body {font-family: "Lato", sans-serif}
+    .header {
+        width: 100%;
+        height: 40px;
+        background: #222322;
+        font-weight: bold;
+        line-height: 1.3em;
+        color: white;
+        margin-bottom: 80px;
+    }
+    .name {
+        width: 100%;
+        /* height: 90%; */
+        background: linear-gradient(to right, #932828 0, #620000 100%);
+        font-weight: bold;
+        /* line-height: 1.3em; */
+        /* text-align: center; */
+        color: white;
+    }
+    .column {
+        float: left;
+        width: 33%;
+        text-align: center;
+    }
+
+    /* Clear floats after the columns */
+    .row:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+    .dot {
+        height: 50px;
+        width: 50px;
+        background-color: rgb(255, 0, 0);
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+    }
+
+    .dot2 {
+        height: 50px;
+        width: 50px;
+        background-color: rgb(83, 80, 80);
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+    }
+
+    .center {
+        color: white;
+        font-weight: bold;
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    }
+</style>
+<body>
+<div class="header">
+    <div style="position: relative;">
+        <img style="position: absolute;" src="image/logo.png" alt="logo">
+        <span style="position: absolute; right: 5px; top: 5px;">MEDLEMSKORT</span>
+        <span style="position: absolute; top: 100px; right: 0px">
+            {% if show_qr %}
+            <a href="/">Billede</a>
+            {% else %}
+            <a href="/qr">QR</a>
+            {% endif %}
+        </span>
+    </div>
+    <div>
+        
+    </div>
+</div>
+
+<div style="position: relative; text-align: center; margin-bottom: 10px;">
+    <img style="width: 256px;" src="{{ img }}" alt="logo">
+    {% if not has_img %}
+        <div style="position: absolute" class="center">
+            <form action="image" method="POST" enctype="multipart/form-data">
+                Single image: <input type="file" name="image"/></br>
+                <button type="submit" name="button" value="send">Upload</button>
+            </form>
+        </div>
+    {% endif %}
+</div>
+
+
+<div style="width: 100%; text-align: center;">
+    <span>
+        {{ username }}
+    </span>
+</div>
+<div style="width: 100%; text-align: center;">
+    <span>
+        Valid til: {{ valid_to }}
+    </span>
+</div>
+
+<div style="margin-top: 40px;" class="row">
+    <div class="column">
+        <span class="{{ 'dot' if s1 else 'dot2' }}">
+            <span class="center">S1 </span>
+        </span>
+    </div>
+    <div class="column">
+        <span class="{{ 'dot' if s2 else 'dot2' }}">
+            <span class="center">S2</span>
+        </span>
+    </div>
+    <div class="column">
+        <span class="{{ 'dot' if s3 else 'dot2' }}">
+            <span class="center">S3</span>
+        </span>
+    </div>
+  </div>
+
+</body>
