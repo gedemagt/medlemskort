@@ -5,15 +5,6 @@ from flask_login import UserMixin
 
 
 @dataclass
-class Token:
-    generated: datetime
-    user: str
-    valid_to: datetime
-    token_valid_to: datetime
-    token: str
-
-
-@dataclass
 class User(UserMixin):
 
     id: str
@@ -22,4 +13,13 @@ class User(UserMixin):
     s1: bool
     s2: bool
     s3: bool
-    image: str = None
+
+
+@dataclass
+class Token:
+    generated: datetime
+    user: User
+    valid_to: datetime
+    token_valid_to: datetime
+    token: str
+

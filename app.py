@@ -1,18 +1,24 @@
 from datetime import datetime, timedelta
 from io import BytesIO
 
+import qrcode
 from PIL import Image
 from flask import Flask, render_template, send_from_directory, send_file, redirect, request
 from flask_login import LoginManager, login_required, logout_user, current_user, login_user
 
-import repository
+from repositories import LoginFailedException, TokenNotFoundException
+from repositories.sqlite import DBRepository
 
 app = Flask(__name__)
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.secret_key = "logn_secret_kley"
 
 login_manager.login_view = 'login'
+
+repository = DBRepository()
+repository.init(app)
 
 
 @login_manager.user_loader
@@ -29,19 +35,19 @@ def serve_pil_image(pil_img: Image):
 
 @app.get("/token/<token>")
 def valid_toke(token):
-
-    token = repository.get_token(token)
-
-    if token:
+    try:
+        token = repository.get_token(token)
         return render_template("token.html", is_valid=token.token_valid_to >= datetime.now())
-    else:
+    except TokenNotFoundException:
         return render_template("token.html", is_valid=False)
 
 
 @app.get("/image/qr")
 @login_required
 def qr():
-    return serve_pil_image(repository.get_qr_image(current_user.id))
+    token = repository.renew_token(current_user.id)
+    img = qrcode.make(f"{request.url_root}token/{token.token}")
+    return serve_pil_image(img)
 
 
 @app.get("/image/<image>")
@@ -72,7 +78,10 @@ def with_qr():
 
 @app.post("/login")
 def login():
-    login_user(repository.login(request.form["username"], request.form["password"]), duration=timedelta(minutes=30))
+    try:
+        login_user(repository.login(request.form["username"], request.form["password"]), duration=timedelta(minutes=30))
+    except LoginFailedException as e:
+        print("Login failed")
     return redirect("/")
 
 
