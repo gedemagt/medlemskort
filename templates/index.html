@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-    body {font-family: "Lato", sans-serif}
+    body {
+        max-width: 1284px;
+        max-height: 2778px;
+        font-family: "Lato", sans-serif
+    }
     .header {
         width: 100%;
         height: 40px;
@@ -65,63 +69,78 @@
     }
 </style>
 <body>
-<div class="header">
-    <div style="position: relative;">
-        <img style="position: absolute;" src="image/logo.png" alt="logo">
-        <span style="position: absolute; right: 5px; top: 5px;">MEDLEMSKORT</span>
-        <span style="position: absolute; top: 100px; right: 0px">
-            {% if show_qr %}
-            <a href="/">Billede</a>
-            {% else %}
-            <a href="/qr">QR</a>
-            {% endif %}
-        </span>
-    </div>
-    <div>
-        
-    </div>
-</div>
-
-<div style="position: relative; text-align: center; margin-bottom: 10px;">
-    <img style="width: 256px;" src="{{ img }}" alt="logo">
-    {% if not has_img %}
-        <div style="position: absolute" class="center">
-            <form action="image" method="POST" enctype="multipart/form-data">
-                Single image: <input type="file" name="image"/></br>
-                <button type="submit" name="button" value="send">Upload</button>
-            </form>
+    <div class="header">
+        <div style="position: relative;">
+            <img style="position: absolute;" src="image/logo.png" alt="logo">
+            <span style="position: absolute; right: 5px; top: 5px;">MEDLEMSKORT</span>
+            <span style="position: absolute; top: 100px; right: 0px">
+                {% if show_qr %}
+                <a href="/">Billede</a>
+                {% else %}
+                <a href="/qr">QR</a>
+                {% endif %}
+            </span>
         </div>
-    {% endif %}
-</div>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 10px;">
+
+        {% if not has_img %}
+            <div style="">
+                <form action="image" method="POST" enctype="multipart/form-data">
+                    <span style="text-align: left">
+                        <input accept="image/*" type="file" name="image" id="imgID" style="display: none;" />
+                        <input type="button" value="Browse..." onclick="document.getElementById('imgID').click();" />
+                    </span>
+                    <span style="text-align: right">
+                        <button hidden="true" id="upload-btn" type="submit" name="button" value="send">Upload</button>
+                    </span>
+                </form>
+            </div>
+        {% endif %}
+        <img id="user-img" style="width: 256px; height: 256px;" src="{{ img }}" alt="logo">
+    </div>
 
 
-<div style="width: 100%; text-align: center;">
-    <span>
-        {{ username }}
-    </span>
-</div>
-<div style="width: 100%; text-align: center;">
-    <span>
-        Valid til: {{ valid_to }}
-    </span>
-</div>
+    <div style="width: 100%; text-align: center;">
+        <span>
+            {{ username }}
+        </span>
+    </div>
+    <div style="width: 100%; text-align: center;">
+        <span>
+            Valid til: {{ valid_to }}
+        </span>
+    </div>
 
-<div style="margin-top: 40px;" class="row">
-    <div class="column">
-        <span class="{{ 'dot' if s1 else 'dot2' }}">
-            <span class="center">S1 </span>
-        </span>
-    </div>
-    <div class="column">
-        <span class="{{ 'dot' if s2 else 'dot2' }}">
-            <span class="center">S2</span>
-        </span>
-    </div>
-    <div class="column">
-        <span class="{{ 'dot' if s3 else 'dot2' }}">
-            <span class="center">S3</span>
-        </span>
-    </div>
+    <div style="margin-top: 40px;" class="row">
+        <div class="column">
+            <span class="{{ 'dot' if s1 else 'dot2' }}">
+                <span class="center">S1 </span>
+            </span>
+        </div>
+        <div class="column">
+            <span class="{{ 'dot' if s2 else 'dot2' }}">
+                <span class="center">S2</span>
+            </span>
+        </div>
+        <div class="column">
+            <span class="{{ 'dot' if s3 else 'dot2' }}">
+                <span class="center">S3</span>
+            </span>
+        </div>
   </div>
-
+    <script>
+        imgInp = document.getElementById("imgID");
+        img = document.getElementById("user-img");
+        uploadBtn = document.getElementById("upload-btn");
+        imgInp.onchange = evt => {
+          const [file] = imgInp.files
+          if (file) {
+            img.src = URL.createObjectURL(file)
+              uploadBtn.hidden = true;
+          }
+          uploadBtn.hidden = false;
+        }
+    </script>
 </body>
