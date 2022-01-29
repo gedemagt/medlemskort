@@ -1,5 +1,5 @@
 venv
 user_images/*
-*.png
 .idea
 __pycache__
+*.db
