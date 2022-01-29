@@ -6,7 +6,8 @@ from PIL import Image
 from flask import Flask, render_template, send_from_directory, send_file, redirect, request
 from flask_login import LoginManager, login_required, logout_user, current_user, login_user
 
-from repositories import LoginFailedException, TokenNotFoundException
+from models import User
+from repositories import LoginFailedException, TokenNotFoundException, UserNotFoundException
 from repositories.sqlite import DBRepository
 
 app = Flask(__name__)
@@ -19,6 +20,14 @@ login_manager.login_view = 'login'
 
 repository = DBRepository()
 repository.init(app)
+
+with app.app_context():
+    try:
+        repository.get_user("erik")
+    except UserNotFoundException:
+        repository.add_user(User(
+            "erik", "Erik Eriksen", datetime(2022, 2, 1), False, False, False, password="pass"
+        ))
 
 
 @login_manager.user_loader

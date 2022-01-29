@@ -1,30 +1,37 @@
-from datetime import datetime
 from models import Token, User
-from repositories import TokenNotFoundException
+from repositories import TokenNotFoundException, LoginFailedException, UserNotFoundException
 from repositories.image import ImageRepo
 
 
 class InMemoryRepo(ImageRepo):
+
+    def delete_user(self, user: User):
+        if user.id in self._users:
+            self._users.pop(user.id)
+
+    def update_user(self, user: User):
+        self._users[user.id] = user
+
+    def add_user(self, user: User):
+        self._users[user.id] = user
 
     def __init__(self):
         super().__init__()
 
         self._tokens = {}
 
-        self._users = {"erik": User(**{
-            "id": "erik",
-            "name": "Erik Eriksen",
-            "valid_to": datetime(2022, 10, 10),
-            "s1": True,
-            "s2": True,
-            "s3": False
-        })}
+        self._users = {}
 
-    def login(self, username: str, password: str) -> User:
-        return self._users["erik"]
+    def login(self, user_id: str, password: str) -> User:
+        if user_id in self._users and self._users[user_id].password == password:
+            return self._users[user_id]
+        raise LoginFailedException()
 
     def get_user(self, user_id: str) -> User:
-        return self._users["erik"]
+        try:
+            return self._users[user_id]
+        except KeyError:
+            raise UserNotFoundException()
 
     def set_token(self, token: Token):
         self._tokens[token.token] = token

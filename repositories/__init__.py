@@ -34,6 +34,15 @@ class Repository:
     def init(self, app: Flask):
         pass
 
+    def delete_user(self, user: User):
+        raise NotImplementedError
+
+    def update_user(self, user: User):
+        raise NotImplementedError
+
+    def add_user(self, user: User):
+        raise NotImplementedError
+
     def login(self, username: str, password: str) -> User:
         raise NotImplementedError
 
@@ -56,7 +65,6 @@ class Repository:
         token = Token(
             generated=datetime.now(),
             user=user,
-            valid_to=user.valid_to,
             token_valid_to=datetime.now() + timedelta(minutes=30),
             token=token
         )

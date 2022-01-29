@@ -13,13 +13,14 @@ class User(UserMixin):
     s1: bool
     s2: bool
     s3: bool
+    source: str = "local"
+    password: str = None
 
 
 @dataclass
 class Token:
     generated: datetime
     user: User
-    valid_to: datetime
     token_valid_to: datetime
     token: str
 

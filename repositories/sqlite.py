@@ -34,21 +34,52 @@ class TokenModel(db.Model):
     token_valid_to = db.Column(db.DateTime)
 
     def __repr__(self):
-        return '<Token %r>' %self.name
+        return '<Token %r>' % self.name
 
 
 class DBRepository(ImageRepo):
+
+    def delete_user(self, user: User):
+        user_model = UserModel.query.filter_by(username=user.id).first()
+        if user is None:
+            raise UserNotFoundException()
+        db.session.delete(user_model)
+        db.session.commit()
+
+    def update_user(self, user: User):
+        user_model = UserModel.query.filter_by(username=user.id).first()
+        if user is None:
+            raise UserNotFoundException()
+        user_model.username = user.id
+        user_model.name = user.name
+        user_model.password = user.password
+        user_model.source = user.source
+        user_model.valid_to = user.valid_to
+        user_model.s1 = user.s1
+        user_model.s2 = user.s2
+        user_model.s3 = user.s3
+        db.session.commit()
+
+    def add_user(self, user: User):
+        db.session.add(
+            UserModel(
+                username=user.id,
+                name=user.name,
+                password=user.password,
+                source=user.source,
+                valid_to=user.valid_to,
+                s1=user.s1,
+                s2=user.s2,
+                s3=user.s3
+            )
+        )
+        db.session.commit()
 
     def init(self, app: Flask):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
         db.init_app(app)
         with app.app_context():
             db.create_all()
-
-            if UserModel.query.filter_by(username="erik").first() is None:
-                db.session.add(
-                    UserModel(username="erik", name="Erik Eriksen", password="pass", source="local", valid_to=datetime(2022, 2, 1)))
-                db.session.commit()
 
     def login(self, username: str, password: str) -> User:
         um = UserModel.query.filter_by(username=username, password=password).first()
@@ -82,7 +113,6 @@ class DBRepository(ImageRepo):
                 user=token.user.id,
                 token=token.token,
                 generated=token.generated,
-                valid_to=token.valid_to,
                 token_valid_to=token.token_valid_to
             )
         )
@@ -90,13 +120,12 @@ class DBRepository(ImageRepo):
         # TODO: Delete old token for this user
 
     def get_token(self, token: str) -> Token:
-        tm = TokenModel.query.filter_by(token=token).first()
+        tm = TokenModel.query.filter_by(token=token).filter(TokenModel.token_valid_to >= datetime.now()).first()
         if tm is None:
             raise TokenNotFoundException()
         return Token(
             user=self.get_user(tm.user),
             token=tm.token,
             generated=tm.generated,
-            valid_to=tm.valid_to,
             token_valid_to=tm.token_valid_to
         )
