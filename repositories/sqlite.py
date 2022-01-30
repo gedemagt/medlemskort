@@ -22,7 +22,7 @@ class UserModel(db.Model):
     s3 = db.Column(db.Boolean, nullable=False, default=False)
 
     def __repr__(self):
-        return '<User %r>' % self.name
+        return f'<User {self.username}>'
 
 
 class TokenModel(db.Model):
@@ -34,7 +34,7 @@ class TokenModel(db.Model):
     token_valid_to = db.Column(db.DateTime)
 
     def __repr__(self):
-        return '<Token %r>' % self.name
+        return f'<Token {self.token}>'
 
 
 class DBRepository(ImageRepo):
@@ -108,6 +108,9 @@ class DBRepository(ImageRepo):
         )
 
     def set_token(self, token: Token):
+
+        TokenModel.query.filter_by(user=token.user).delete()
+
         db.session.add(
             TokenModel(
                 user=token.user.id,
@@ -116,8 +119,6 @@ class DBRepository(ImageRepo):
                 token_valid_to=token.token_valid_to
             )
         )
-
-        # TODO: Delete old token for this user
 
     def get_token(self, token: str) -> Token:
         tm = TokenModel.query.filter_by(token=token).filter(TokenModel.token_valid_to >= datetime.now()).first()
