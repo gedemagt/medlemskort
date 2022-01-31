@@ -109,7 +109,7 @@ class DBRepository(ImageRepo):
 
     def set_token(self, token: Token):
 
-        TokenModel.query.filter_by(user=token.user).delete()
+        TokenModel.query.filter_by(user=token.user.id).delete()
 
         db.session.add(
             TokenModel(
