@@ -119,9 +119,11 @@ class DBRepository(ImageRepo):
                 token_valid_to=token.token_valid_to
             )
         )
+        db.session.commit()
 
     def get_token(self, token: str) -> Token:
-        tm = TokenModel.query.filter_by(token=token).filter(TokenModel.token_valid_to >= datetime.now()).first()
+        tm = TokenModel.query.filter_by(token=token).first()
+
         if tm is None:
             raise TokenNotFoundException()
         return Token(

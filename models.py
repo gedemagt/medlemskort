@@ -23,4 +23,3 @@ class Token:
     user: User
     token_valid_to: datetime
     token: str
-
