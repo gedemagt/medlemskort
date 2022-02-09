@@ -1,6 +1,11 @@
+html {
+    height: 100vh;
+}
+
 body {
-    max-width: 10cm;
-    max-height: 20cm;
+    height: 100%Fi;
+    max-width: 15cm;
+    max-height: 35cm;
     font-family: "Lato", sans-serif;
     position: relative;
 }
