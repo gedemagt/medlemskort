@@ -4,7 +4,7 @@ from datetime import timedelta
 from io import BytesIO
 
 import qrcode
-from PIL import Image
+from PIL import Image, ImageOps
 from flask import Flask, render_template, send_from_directory, send_file, redirect, request
 from flask_login import LoginManager, login_required, logout_user, current_user, login_user
 
@@ -67,7 +67,6 @@ def valid_toke(token):
 def qr():
     token = repository.renew_token(current_user)
     url = f"{request.url_root}token/{token.token}"
-    print(url)
     img = qrcode.make(url)
     return serve_pil_image(img)
 
@@ -92,7 +91,10 @@ def user_image():
 @login_required
 def set_images():
     file = request.files['image']
-    repository.set_image(current_user.id, Image.open(file.stream))
+    image = Image.open(file.stream)
+    image = ImageOps.exif_transpose(image)
+
+    repository.set_image(current_user.id, image)
 
     return redirect("/")
 
