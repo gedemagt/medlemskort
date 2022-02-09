@@ -1,3 +1,4 @@
+import datetime
 import os
 from datetime import timedelta
 from io import BytesIO
@@ -56,23 +57,29 @@ def serve_pil_image(pil_img: Image):
 def valid_toke(token):
     try:
         token = repository.get_token(token, api)
-        return render_template("token.html", token=token, valid_to=token.user.active)
+        return render_template("token.html", token=token, valid_to=token.user.active, generated_at=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     except TokenNotFoundException:
-        return render_template("token.html", token=None)
+        return render_template("invalid_token.html", token=None)
 
 
 @app.get("/image/qr")
 @login_required
 def qr():
     token = repository.renew_token(current_user)
-    print(f"{request.url_root}token/{token.token}")
-    img = qrcode.make(f"{request.url_root}token/{token.token}")
+    url = f"{request.url_root}token/{token.token}"
+    print(url)
+    img = qrcode.make(url)
     return serve_pil_image(img)
 
 
 @app.get("/image/<image>")
 def images(image):
     return send_from_directory("images", image)
+
+
+@app.get("/css/<stylesheet>")
+def stylesheet(stylesheet):
+    return send_from_directory("css", stylesheet)
 
 
 @app.get("/image/user")

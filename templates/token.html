@@ -3,81 +3,7 @@
 <title>W3.CSS Template</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-    body {
-        max-width: 1284px;
-        max-height: 2778px;
-        font-family: "Lato", sans-serif
-    }
-    .header {
-        width: 100%;
-        height: 40px;
-        background: #222322;
-        font-weight: bold;
-        line-height: 1.3em;
-        color: white;
-        margin-bottom: 80px;
-    }
-    .name {
-        width: 100%;
-        /* height: 90%; */
-        background: linear-gradient(to right, #932828 0, #620000 100%);
-        font-weight: bold;
-        /* line-height: 1.3em; */
-        /* text-align: center; */
-        color: white;
-    }
-    .column {
-        float: left;
-        width: 33%;
-        text-align: center;
-    }
-
-    /* Clear floats after the columns */
-    .row:after {
-        content: "";
-        display: table;
-        clear: both;
-    }
-    .dot {
-        height: 50px;
-        width: 50px;
-        background-color: rgb(255, 0, 0);
-        border-radius: 50%;
-        display: inline-block;
-        position: relative;
-    }
-
-    .dot2 {
-        height: 50px;
-        width: 50px;
-        background-color: rgb(83, 80, 80);
-        border-radius: 50%;
-        display: inline-block;
-        position: relative;
-    }
-
-    .aktivt {
-        color: green;
-        font-weight: bold;
-    }
-
-    .inaktivt {
-        color: darkred;
-        font-weight: bold;
-    }
-
-    .center {
-        color: white;
-        font-weight: bold;
-        margin: 0;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        -ms-transform: translate(-50%, -50%);
-        transform: translate(-50%, -50%);
-    }
-</style>
+<link rel="stylesheet" href="/css/style.css">
 <body>
     <div class="header">
         <div style="position: relative;">
@@ -102,8 +28,13 @@
             {{ "Aktivt medlem" if valid_to else "Inaktivt medlem" }}
         </span>
     </div>
+    <div style="width: 100%; text-align: center;">
+        <span style="font-size: small;">
+            Genereret: {{ generated_at }}
+        </span>
+    </div>
 
-    <div style="margin-top: 40px;" class="row">
+    <div style="margin-top: 20px; margin-bottom: 20px;" class="row">
         <div class="column">
             <span class="{{ 'dot' if token.user.s1 else 'dot2' }}">
                 <span class="center">S1 </span>
