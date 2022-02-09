@@ -4,6 +4,7 @@ from pathlib import Path
 
 from PIL import Image
 
+from models import User
 from repositories import Repository, ImageNotFoundException
 
 
@@ -20,8 +21,8 @@ class ImageRepo(Repository):
         else:
             raise ImageNotFoundException("Could not locate image form user_id")
 
-    def get_image_path(self, user_id: str) -> Path:
-        image_path = glob.glob(os.path.join("user_images", user_id + "*"))
+    def get_image_path(self, user: User) -> Path:
+        image_path = glob.glob(os.path.join("user_images", user.id + "*"))
         if image_path:
             return Path(image_path[0])
         else:

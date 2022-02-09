@@ -57,6 +57,16 @@
         position: relative;
     }
 
+    .aktivt {
+        color: green;
+        font-weight: bold;
+    }
+
+    .inaktivt {
+        color: darkred;
+        font-weight: bold;
+    }
+
     .center {
         color: white;
         font-weight: bold;
@@ -108,8 +118,8 @@
         </span>
     </div>
     <div style="width: 100%; text-align: center;">
-        <span>
-            Valid til: {{ valid_to }}
+        <span class="{{ "aktivt" if valid_to else "inaktivt" }}">
+            {{ "Aktivt medlem" if valid_to else "Inaktivt medlem" }}
         </span>
     </div>
 

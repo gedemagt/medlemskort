@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -16,7 +14,7 @@ class UserModel(db.Model):
     name = db.Column(db.String)
     password = db.Column(db.String)
     source = db.Column(db.String)
-    valid_to = db.Column(db.DateTime)
+    active = db.Column(db.Boolean)
     s1 = db.Column(db.Boolean, nullable=False, default=False)
     s2 = db.Column(db.Boolean, nullable=False, default=False)
     s3 = db.Column(db.Boolean, nullable=False, default=False)
@@ -54,7 +52,7 @@ class DBRepository(ImageRepo):
         user_model.name = user.name
         user_model.password = user.password
         user_model.source = user.source
-        user_model.valid_to = user.valid_to
+        user_model.active = user.active
         user_model.s1 = user.s1
         user_model.s2 = user.s2
         user_model.s3 = user.s3
@@ -67,7 +65,7 @@ class DBRepository(ImageRepo):
                 name=user.name,
                 password=user.password,
                 source=user.source,
-                valid_to=user.valid_to,
+                active=user.active,
                 s1=user.s1,
                 s2=user.s2,
                 s3=user.s3
@@ -88,7 +86,7 @@ class DBRepository(ImageRepo):
         return User(
             id=um.username,
             name=um.name,
-            valid_to=um.valid_to,
+            active=um.active,
             s1=um.s1,
             s2=um.s2,
             s3=um.s3
@@ -101,7 +99,7 @@ class DBRepository(ImageRepo):
         return User(
             id=um.username,
             name=um.name,
-            valid_to=um.valid_to,
+            active=um.active,
             s1=um.s1,
             s2=um.s2,
             s3=um.s3
@@ -121,13 +119,14 @@ class DBRepository(ImageRepo):
         )
         db.session.commit()
 
-    def get_token(self, token: str) -> Token:
+    def get_token(self, token: str, user_repo) -> Token:
         tm = TokenModel.query.filter_by(token=token).first()
 
         if tm is None:
             raise TokenNotFoundException()
+
         return Token(
-            user=self.get_user(tm.user),
+            user=user_repo.get_user(tm.user),
             token=tm.token,
             generated=tm.generated,
             token_valid_to=tm.token_valid_to

@@ -58,8 +58,7 @@ class Repository:
     def get_image_path(self, user_id: str) -> Path:
         raise NotImplementedError
 
-    def renew_token(self, user_id: str) -> Token:
-        user = self.get_user(user_id)
+    def renew_token(self, user: User) -> Token:
         token = secrets.token_urlsafe(50)
 
         token = Token(
@@ -75,10 +74,9 @@ class Repository:
     def set_token(self, token: Token):
         raise NotImplementedError
 
-    def get_qr_image(self, user_id: str) -> Image:
+    def get_qr_image(self, user: User) -> Image:
 
-        token = self.renew_token(user_id)
-        print(token)
+        token = self.renew_token(user)
         img = qrcode.make(f"{request.url_root}token/{token.token}")
 
         return img

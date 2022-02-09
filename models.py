@@ -9,7 +9,7 @@ class User(UserMixin):
 
     id: str
     name: str
-    valid_to: datetime
+    active: bool
     s1: bool
     s2: bool
     s3: bool
