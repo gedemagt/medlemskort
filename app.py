@@ -92,7 +92,9 @@ def user_image():
 def set_images():
     file = request.files['image']
     image = Image.open(file.stream)
+    fmt = image.format
     image = ImageOps.exif_transpose(image)
+    image.format = fmt
 
     repository.set_image(current_user.id, image)
 
