@@ -57,7 +57,7 @@ def serve_pil_image(pil_img: Image):
 def valid_toke(token):
     try:
         token = repository.get_token(token, api)
-        return render_template("token.html", token=token, valid_to=token.user.active, generated_at=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        return render_template("token.html", token=token, user=token.user, valid_to=token.user.active, generated_at=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     except TokenNotFoundException:
         return render_template("invalid_token.html", token=None)
 
@@ -67,6 +67,7 @@ def valid_toke(token):
 def qr():
     token = repository.renew_token(current_user)
     url = f"{request.url_root}token/{token.token}"
+    print(url)
     img = qrcode.make(url)
     return serve_pil_image(img)
 
@@ -137,8 +138,7 @@ def do_render(show_qr: bool):
 
     return render_template(
         "index.html", img=f"image/{img}", has_img=has_img, show_qr=show_qr,
-        s1=current_user.s1, s2=current_user.s2, s3=current_user.s3, username=current_user.name,
-        valid_to=current_user.active
+        user=current_user
     )
 
 
