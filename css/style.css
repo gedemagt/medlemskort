@@ -5,9 +5,20 @@ html {
 body {
     height: 100%;
     max-width: 15cm;
-    max-height: 35cm;
+    max-height: 25cm;
     font-family: "Lato", sans-serif;
     position: relative;
+    margin: 0;
+    display: flex;
+    flex-flow: column;
+}
+
+.content {
+    flex-flow: column;
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+    margin-bottom: 60px;
 }
 
 .header {
@@ -21,7 +32,7 @@ body {
 }
 
 .footer {
-    position: relative;
+    position: absolute;
     left: 0;
     bottom: 0;
     width: 100%;
