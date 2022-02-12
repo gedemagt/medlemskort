@@ -82,6 +82,11 @@ def stylesheet(stylesheet):
     return send_from_directory("css", stylesheet)
 
 
+@app.get("/js/<script>")
+def script(script):
+    return send_from_directory("js", script)
+
+
 @app.get("/image/user")
 @login_required
 def user_image():
@@ -91,11 +96,18 @@ def user_image():
 @app.post("/image")
 @login_required
 def set_images():
+    x = float(request.values["cropX"])
+    y = float(request.values["cropY"])
+    w = float(request.values["cropW"])
+    h = float(request.values["cropH"])
     file = request.files['image']
     image = Image.open(file.stream)
     fmt = image.format
     image = ImageOps.exif_transpose(image)
-    image.format = fmt
+    image = image.crop((x, y, x+w, y+h))
+    aspect_ratio = image.width / image.height
+    image.thumbnail((aspect_ratio * 512, 512), Image.ANTIALIAS)
+    image.format = "jpeg"
 
     repository.set_image(current_user.id, image)
 

@@ -14,6 +14,10 @@
                     <span style="text-align: left">
                         <input accept="image/*" type="file" name="image" id="imgID" style="display: none;" />
                         <input type="button" value="Browse..." onclick="document.getElementById('imgID').click();" />
+                        <input type="hidden" name="cropX" id="cropX">
+                        <input type="hidden" name="cropY" id="cropY">
+                        <input type="hidden" name="cropW" id="cropW">
+                        <input type="hidden" name="cropH" id="cropH">
                     </span>
                     <span style="text-align: right">
                         <button hidden="true" id="upload-btn" type="submit" name="button" value="send">Upload</button>
@@ -36,18 +40,5 @@
     </div>
 
     {% include 'belays.html' %}
-
-    <script>
-        imgInp = document.getElementById("imgID");
-        img = document.getElementById("user-img");
-        uploadBtn = document.getElementById("upload-btn");
-        imgInp.onchange = evt => {
-          const [file] = imgInp.files
-          if (file) {
-            img.src = URL.createObjectURL(file)
-              uploadBtn.hidden = true;
-          }
-          uploadBtn.hidden = false;
-        }
-    </script>
+    <script src="/js/script.js"></script>
 {% endblock %}
