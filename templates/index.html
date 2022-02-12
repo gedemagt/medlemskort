@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-    <span style="position: absolute; top: 100px; right: 0">
+    <span style="position: absolute; top: 100px; right: 10px">
         {% if show_qr %}
         <a href="/">Billede</a>
         {% else %}
@@ -9,7 +9,7 @@
     </span>
     <div style="text-align: center; height: 40vh; margin-top: 20px">
         {% if not has_img %}
-            <div style="">
+            <div style="margin-bottom: 10px">
                 <form action="image" method="POST" enctype="multipart/form-data">
                     <span style="text-align: left">
                         <input accept="image/*" type="file" name="image" id="imgID" style="display: none;" />
@@ -27,18 +27,27 @@
         {% endif %}
         <img id="user-img" style="max-width:98%; max-height:98%; margin: auto" src="{{ img }}" alt="logo">
     </div>
+    {% if has_img %}
+        <div style="width: 100%; text-align: center;">
+            <span style="font-size: 2em">
+                {{ user.name }}
+            </span>
+        </div>
+        <div style="width: 100%; text-align: center; font-weight: bolder; font-size: 1.5em; margin-top: 5px">
+            <span class="{{ "aktivt" if user.active else "inaktivt" }}">
+                {{ "Aktivt medlem" if user.active else "Inaktivt medlem" }}
+            </span>
+        </div>
+        {% include 'belays.html' %}
+    {% else %}
+        <div style="width: 100%; text-align: center; margin-top: 40px">
+            <span style="font-size: 1em">
+                Vælg venligst et profilbillede
+            </span>
+        </div>
+    {% endif %}
 
-    <div style="width: 100%; text-align: center;">
-        <span style="font-size: 2em">
-            {{ user.name }}
-        </span>
-    </div>
-    <div style="width: 100%; text-align: center; font-weight: bolder; font-size: 1.5em; margin-top: 5px">
-        <span class="{{ "aktivt" if user.active else "inaktivt" }}">
-            {{ "Aktivt medlem" if user.active else "Inaktivt medlem" }}
-        </span>
-    </div>
 
-    {% include 'belays.html' %}
+
     <script src="/js/script.js"></script>
 {% endblock %}
