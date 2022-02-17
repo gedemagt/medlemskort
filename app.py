@@ -1,4 +1,3 @@
-import datetime
 import os
 from datetime import timedelta
 from io import BytesIO
@@ -10,7 +9,7 @@ from flask import Flask, render_template, send_from_directory, send_file, redire
 from flask_login import LoginManager, login_required, logout_user, current_user, login_user
 
 from api import ConventusAPI
-from repositories import LoginFailedException, TokenNotFoundException, UserNotFoundException, ImageNotFoundException, \
+from repositories import LoginFailedException, TokenNotFoundException, ImageNotFoundException, \
     TokenRepository, ImageRepository
 from repositories.image import ImageRepo
 from repositories.sqlite import DBRepository, SQLiteTokenRepository
@@ -55,7 +54,7 @@ def valid_toke(token):
         token = token_repo.get_token(token)
         return render_template(
             "token.html", token=token, user=token.user, valid_to=token.user.active,
-            generated_at=pendulum.now("Europe/Paris").strftime("%Y-%m-%d %H:%M:%S")
+            generated_at=token.generated.astimezone(pendulum.timezone("Europe/Paris")).strftime("%Y-%m-%d %H:%M:%S")
         )
     except TokenNotFoundException:
         return render_template("invalid_token.html", token=None)

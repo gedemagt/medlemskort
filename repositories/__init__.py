@@ -38,9 +38,9 @@ class TokenRepository:
         token = secrets.token_urlsafe(50)
 
         token = Token(
-            generated=datetime.now(),
+            generated=datetime.utcnow(),
             user=user,
-            token_valid_to=datetime.now() + timedelta(minutes=30),
+            token_valid_to=datetime.utcnow() + timedelta(minutes=30),
             token=token
         )
         self.set_token(token)

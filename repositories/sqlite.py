@@ -1,3 +1,4 @@
+import pendulum
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -27,9 +28,9 @@ class TokenModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.String(), nullable=False)
     token = db.Column(db.String(), nullable=False)
-    generated = db.Column(db.DateTime)
-    valid_to = db.Column(db.DateTime)
-    token_valid_to = db.Column(db.DateTime)
+    generated = db.Column(db.DateTime(timezone=True))
+    valid_to = db.Column(db.DateTime(timezone=True))
+    token_valid_to = db.Column(db.DateTime(timezone=True))
 
     def __repr__(self):
         return f'<Token {self.token}>'
@@ -140,6 +141,6 @@ class SQLiteTokenRepository(TokenRepository):
         return Token(
             user=self._user_repo.get_user(tm.user),
             token=tm.token,
-            generated=tm.generated,
-            token_valid_to=tm.token_valid_to
+            generated=pendulum.timezone("UTC").fromutc(tm.generated),
+            token_valid_to=pendulum.timezone("UTC").fromutc(tm.token_valid_to)
         )
