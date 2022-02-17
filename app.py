@@ -24,7 +24,7 @@ app = Flask(__name__)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-app.secret_key = "logn_secret_kley"
+app.secret_key = os.getenv("APP_SECRET_KEY", "logn_secret_kley")
 
 login_manager.login_view = 'login'
 
