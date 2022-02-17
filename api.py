@@ -2,10 +2,19 @@ import requests
 import xmltodict
 
 from models import User
-from repositories import LoginFailedException
+from repositories import LoginFailedException, Repository
 
 
-class ConventusAPI:
+class ConventusAPI(Repository):
+
+    def delete_user(self, user: User):
+        raise NotImplementedError("Conventus API is read-only")
+
+    def update_user(self, user: User):
+        raise NotImplementedError("Conventus API is read-only")
+
+    def add_user(self, user: User):
+        raise NotImplementedError("Conventus API is read-only")
 
     def __init__(self, apikey, foreningsid):
         self._apikey = apikey
@@ -53,4 +62,3 @@ class ConventusAPI:
             afdeling="45085"
         ))
         return xmltodict.parse(r.text)["conventus"]["grupper"]["gruppe"]
-

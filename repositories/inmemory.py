@@ -1,9 +1,9 @@
 from models import Token, User
 from repositories import TokenNotFoundException, LoginFailedException, UserNotFoundException
-from repositories.image import ImageRepo
+from repositories import ImageRepository, TokenRepository, Repository
 
 
-class InMemoryRepo(ImageRepo):
+class InMemoryRepo(TokenRepository, Repository):
 
     def delete_user(self, user: User):
         if user.id in self._users:
@@ -17,9 +17,7 @@ class InMemoryRepo(ImageRepo):
 
     def __init__(self):
         super().__init__()
-
         self._tokens = {}
-
         self._users = {}
 
     def login(self, user_id: str, password: str) -> User:

@@ -5,10 +5,10 @@ from pathlib import Path
 from PIL import Image
 
 from models import User
-from repositories import Repository, ImageNotFoundException
+from repositories import ImageNotFoundException, ImageRepository
 
 
-class ImageRepo(Repository):
+class ImageRepo(ImageRepository):
 
     def set_image(self, user_id: str, img: Image):
         img.save(os.path.join(os.getcwd(), "user_images", user_id + "." + img.format.lower()))

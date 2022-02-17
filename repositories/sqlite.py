@@ -2,8 +2,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 from models import User, Token
-from repositories import LoginFailedException, UserNotFoundException, TokenNotFoundException
-from repositories.image import ImageRepo
+from repositories import LoginFailedException, UserNotFoundException, TokenNotFoundException, Repository, \
+    TokenRepository
 
 db = SQLAlchemy()
 
@@ -35,7 +35,7 @@ class TokenModel(db.Model):
         return f'<Token {self.token}>'
 
 
-class DBRepository(ImageRepo):
+class DBRepository(Repository):
 
     def delete_user(self, user: User):
         user_model = UserModel.query.filter_by(username=user.id).first()
@@ -105,6 +105,18 @@ class DBRepository(ImageRepo):
             s3=um.s3
         )
 
+
+class SQLiteTokenRepository(TokenRepository):
+
+    def __init__(self, user_repo: Repository):
+        self._user_repo = user_repo
+
+    def init(self, app: Flask):
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+        db.init_app(app)
+        with app.app_context():
+            db.create_all()
+
     def set_token(self, token: Token):
 
         TokenModel.query.filter_by(user=token.user.id).delete()
@@ -119,14 +131,14 @@ class DBRepository(ImageRepo):
         )
         db.session.commit()
 
-    def get_token(self, token: str, user_repo) -> Token:
+    def get_token(self, token: str) -> Token:
         tm = TokenModel.query.filter_by(token=token).first()
 
         if tm is None:
             raise TokenNotFoundException()
 
         return Token(
-            user=user_repo.get_user(tm.user),
+            user=self._user_repo.get_user(tm.user),
             token=tm.token,
             generated=tm.generated,
             token_valid_to=tm.token_valid_to

@@ -3,15 +3,17 @@ import os
 from datetime import timedelta
 from io import BytesIO
 
+import pendulum
 import qrcode
 from PIL import Image, ImageOps
 from flask import Flask, render_template, send_from_directory, send_file, redirect, request
 from flask_login import LoginManager, login_required, logout_user, current_user, login_user
 
 from api import ConventusAPI
-from models import User
-from repositories import LoginFailedException, TokenNotFoundException, UserNotFoundException, ImageNotFoundException
-from repositories.sqlite import DBRepository
+from repositories import LoginFailedException, TokenNotFoundException, UserNotFoundException, ImageNotFoundException, \
+    TokenRepository, ImageRepository
+from repositories.image import ImageRepo
+from repositories.sqlite import DBRepository, SQLiteTokenRepository
 
 try:
     import dotenv
@@ -27,23 +29,17 @@ app.secret_key = "logn_secret_kley"
 
 login_manager.login_view = 'login'
 
-repository = DBRepository()
-repository.init(app)
+image_repo: ImageRepository = ImageRepo()
 
-api = ConventusAPI(os.getenv("APIKEY"), os.getenv("FORENINGSID"))
+user_repo = ConventusAPI(os.getenv("APIKEY"), os.getenv("FORENINGSID"))
 
-with app.app_context():
-    try:
-        repository.get_user("erik")
-    except UserNotFoundException:
-        repository.add_user(User(
-            "erik", "Erik Eriksen", True, False, False, False, password="pass"
-        ))
+token_repo: TokenRepository = SQLiteTokenRepository(user_repo)
+token_repo.init(app)
 
 
 @login_manager.user_loader
 def load_user(user_id):
-    return api.get_user(user_id)
+    return user_repo.get_user(user_id)
 
 
 def serve_pil_image(pil_img: Image):
@@ -56,8 +52,11 @@ def serve_pil_image(pil_img: Image):
 @app.get("/token/<token>")
 def valid_toke(token):
     try:
-        token = repository.get_token(token, api)
-        return render_template("token.html", token=token, user=token.user, valid_to=token.user.active, generated_at=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        token = token_repo.get_token(token)
+        return render_template(
+            "token.html", token=token, user=token.user, valid_to=token.user.active,
+            generated_at=pendulum.now("Europe/Paris").strftime("%Y-%m-%d %H:%M:%S")
+        )
     except TokenNotFoundException:
         return render_template("invalid_token.html", token=None)
 
@@ -65,32 +64,31 @@ def valid_toke(token):
 @app.get("/image/qr")
 @login_required
 def qr():
-    token = repository.renew_token(current_user)
+    token = token_repo.renew_token(current_user)
     url = f"{request.url_root}token/{token.token}"
-    print(url)
     img = qrcode.make(url)
     return serve_pil_image(img)
 
 
-@app.get("/image/<image>")
-def images(image):
-    return send_from_directory("images", image)
+@app.get("/image/<_image>")
+def images(_image):
+    return send_from_directory("images", _image)
 
 
-@app.get("/css/<stylesheet>")
-def stylesheet(stylesheet):
-    return send_from_directory("css", stylesheet)
+@app.get("/css/<_stylesheet>")
+def stylesheet(_stylesheet):
+    return send_from_directory("css", _stylesheet)
 
 
-@app.get("/js/<script>")
-def script(script):
-    return send_from_directory("js", script)
+@app.get("/js/<_script>")
+def script(_script):
+    return send_from_directory("js", _script)
 
 
 @app.get("/image/user")
 @login_required
 def user_image():
-    return send_file(repository.get_image_path(current_user))
+    return send_file(image_repo.get_image_path(current_user))
 
 
 @app.post("/image")
@@ -109,7 +107,7 @@ def set_images():
     image.thumbnail((aspect_ratio * 512, 512), Image.ANTIALIAS)
     image.format = "jpeg"
 
-    repository.set_image(current_user.id, image)
+    image_repo.set_image(current_user.id, image)
 
     return redirect("/")
 
@@ -123,7 +121,7 @@ def with_qr():
 @app.post("/login")
 def login():
     try:
-        user = api.login(request.form["username"], request.form["password"])
+        user = user_repo.login(request.form["username"], request.form["password"])
         login_user(user, duration=timedelta(minutes=30))
     except LoginFailedException as e:
         print("Login failed")
@@ -142,7 +140,7 @@ def do_render(show_qr: bool):
         img = "qr"
     else:
         try:
-            repository.get_image_path(current_user)
+            image_repo.get_image_path(current_user)
             img = "user"
         except (ValueError, ImageNotFoundException):
             has_img = False

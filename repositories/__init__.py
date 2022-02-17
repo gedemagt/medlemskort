@@ -29,34 +29,10 @@ class ImageNotFoundException(Exception):
     pass
 
 
-class Repository:
+class TokenRepository:
 
     def init(self, app: Flask):
         pass
-
-    def delete_user(self, user: User):
-        raise NotImplementedError
-
-    def update_user(self, user: User):
-        raise NotImplementedError
-
-    def add_user(self, user: User):
-        raise NotImplementedError
-
-    def login(self, username: str, password: str) -> User:
-        raise NotImplementedError
-
-    def get_user(self, user_id: str) -> User:
-        raise NotImplementedError
-
-    def set_image(self, user_id: str, img: Image):
-        raise NotImplementedError
-
-    def get_image(self, user_id: str) -> Image:
-        raise NotImplementedError
-
-    def get_image_path(self, user_id: str) -> Path:
-        raise NotImplementedError
 
     def renew_token(self, user: User) -> Token:
         token = secrets.token_urlsafe(50)
@@ -82,4 +58,40 @@ class Repository:
         return img
 
     def get_token(self, token: str) -> Token:
+        raise NotImplementedError
+
+
+class ImageRepository:
+
+    def init(self, app: Flask):
+        pass
+
+    def set_image(self, user_id: str, img: Image):
+        raise NotImplementedError
+
+    def get_image(self, user_id: str) -> Image:
+        raise NotImplementedError
+
+    def get_image_path(self, user_id: str) -> Path:
+        raise NotImplementedError
+
+
+class Repository:
+
+    def init(self, app: Flask):
+        pass
+
+    def delete_user(self, user: User):
+        raise NotImplementedError
+
+    def update_user(self, user: User):
+        raise NotImplementedError
+
+    def add_user(self, user: User):
+        raise NotImplementedError
+
+    def login(self, username: str, password: str) -> User:
+        raise NotImplementedError
+
+    def get_user(self, user_id: str) -> User:
         raise NotImplementedError
